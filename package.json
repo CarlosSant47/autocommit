@@ -1,0 +1,44 @@
+{
+  "name": "autocommit",
+  "version": "0.1.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsup",
+    "dev": "bun run --watch ./src/main.ts",
+    "knip": "knip-bun",
+    "prepack": "bun run build",
+    "release": "bumpp && bun publish --access public",
+    "start": "NODE_ENV=production bun run ./src/main.ts"
+  },
+  "bin": {
+    "copilot-api": "./dist/main.js"
+  },
+  "author": "Carlos Santiago <me@carlossant47.com>",
+  "license": "ISC",
+  "description": "Autocommit is a CLI tool that automates the process of committing changes to a Git repository using Github Copilot.",
+  "homepage": "https://github.com/CarlosSant47/autocommit",
+  "bugs": "https://github.com/CarlosSant47/autocommit/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CarlosSant47/autocommit.git"
+  },
+  "type": "module",
+  "dependencies": {
+    "citty": "^0.1.6",
+    "clipboardy": "^4.0.0",
+    "consola": "^3.4.2",
+    "fetch-event-stream": "^0.1.5",
+    "gpt-tokenizer": "^2.9.0",
+    "hono": "^4.7.6",
+    "srvx": "^0.2.7"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.9",
+    "bumpp": "^10.1.0",
+    "eslint": "^9.24.0",
+    "jiti": "^2.4.2",
+    "knip": "^5.49.0",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3"
+  }
+}

@@ -8,7 +8,11 @@ export const getModels = async () => {
     headers: copilotHeaders(state),
   })
 
-  if (!response.ok) throw new HTTPError("Failed to get models", response)
+
+  if (!response.ok) {
+    console.error(await response.text())
+    throw new HTTPError("Failed to get models", response)
+  }
 
   return (await response.json()) as ModelsResponse
 }

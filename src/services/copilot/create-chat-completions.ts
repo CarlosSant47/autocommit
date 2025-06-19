@@ -8,8 +8,6 @@ export const createChatCompletions = async (
   payload: ChatCompletionsPayload,
 ) => {
   if (!state.copilotToken) throw new Error("Copilot token not found")
-
-  console.log(`url: ${copilotBaseUrl(state)}/chat/completions`)
   const response = await fetch(`${copilotBaseUrl(state)}/chat/completions`, {
     method: "POST",
     headers: copilotHeaders(state),

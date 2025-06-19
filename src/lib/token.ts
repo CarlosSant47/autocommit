@@ -9,6 +9,8 @@ import { pollAccessToken } from "~/services/github/poll-access-token"
 
 import { HTTPError } from "./http-error"
 import { state } from "./state"
+import { readAppConfig, writeAppConfig, type Token } from "~/config"
+import { config, exit } from 'node:process';
 
 export const readGithubToken = () =>
   fs.readFile(PATHS.GITHUB_TOKEN_PATH, "utf8")
@@ -16,22 +18,41 @@ export const readGithubToken = () =>
 const writeGithubToken = (token: string) =>
   fs.writeFile(PATHS.GITHUB_TOKEN_PATH, token)
 
+
+
 export const setupCopilotToken = async () => {
-  const { token, refresh_in } = await getCopilotToken()
+  const appConfig = await readAppConfig()
+  if(await validateGitHubToken(appConfig.token)) {
+    const { accessToken } = appConfig.token ?? {}
+    state.copilotToken = accessToken
+    return
+  }
+  const { token, expires_at, refresh_in } = await getCopilotToken()
+  if (!token) {
+    consola.error("Failed to get GitHub Copilot token")
+    exit(1)
+  }
   state.copilotToken = token
+  appConfig.token = {
+    accessToken: token,
+    refreshToken: refresh_in,
+    expiresIn: expires_at,
+  }
+  await writeAppConfig(appConfig)
+  return 
+}
 
-  const refreshInterval = (refresh_in - 60) * 1000
 
-  setInterval(async () => {
-    consola.start("Refreshing Copilot token")
-    try {
-      const { token } = await getCopilotToken()
-      state.copilotToken = token
-    } catch (error) {
-      consola.error("Failed to refresh Copilot token:", error)
-      throw error
-    }
-  }, refreshInterval)
+export const validateGitHubToken = async (token?: Token): Promise<boolean> => {
+  if (!token) {
+    return false
+  }
+  const { expiresIn } = token
+  if((Date.now() / 1000) > (expiresIn || 0)) {
+    consola.warn("GitHub token has expired, re-authenticating...")
+    return false
+  }
+  return true
 }
 
 interface SetupGitHubTokenOptions {

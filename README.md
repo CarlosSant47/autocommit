@@ -31,7 +31,7 @@ npm install
 
 ## Command Structure
 Copilot API now uses a subcommand structure
-- `commit`: Genera el men saje del commit en base al git verbose
+- `commit`: Genera el mensaje del commit en base al git verbose
 - `config global` : Abre la carpeta donde se encuentra la configuracion
 - `config auth` : Permite autenticarnos con las API de Github Copilot
 - `config model` : Permite configurar el modelo predeterminado para la generacion del mensaje del commit (Se requiere iniciar sesion primero)

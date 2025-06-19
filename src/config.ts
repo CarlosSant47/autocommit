@@ -6,14 +6,20 @@ import fs from "node:fs/promises"
 import { ensurePaths, PATHS } from "~/lib/paths"
 
 import { getModels } from "./services/copilot/get-models"
+import { setupCopilotToken, setupGitHubToken } from "./lib/token"
 
+export interface Token {
+  accessToken: string
+  refreshToken?: number
+  expiresIn?: number
+}
 export interface AppConfig {
   url: string
-  token: string
   model: string
   systemPrompt: string
   maxTokens: number
   temperature: number
+  token?: Token
 }
 
 export const readAppConfig = async (): Promise<AppConfig> => {
@@ -72,6 +78,8 @@ export function openGlobalConfig(): void {
 export async function selectModel(model: string): Promise<void> {
   if (!model) {
     consola.info(`Selecting default model`)
+    
+    await setupCopilotToken()
     const models = await getModels()
 
     const options = models.data.map((m) => ({

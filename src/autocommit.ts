@@ -6,7 +6,7 @@ import consola from "consola"
 import { spawnSync } from "node:child_process"
 
 import { readAppConfig } from "./config"
-import { setupGitHubToken } from "./lib/token"
+import {setupCopilotToken, setupGitHubToken} from "./lib/token"
 import {
   createChatCompletions,
   type ChatCompletionResponse,
@@ -20,16 +20,15 @@ export interface AutocommitOptions {
 }
 
 export async function runAutocommit(options: AutocommitOptions): Promise<void> {
-  await setupGitHubToken({ force: false })
-
+  await setupGitHubToken()
+  await setupCopilotToken()
   const stagedChanges = spawnSync("git", ["diff", "--cached", "--quiet"])
   if (stagedChanges.status === 0) {
     consola.error("No staged files to commit.")
-    exit(0)
+    exit(1)
   }
   const commitVerbose = spawnSync("git", ["commit", "-v", "--dry-run"], {})
   const { stdout, stderr } = commitVerbose
-
   const appConfig = await readAppConfig()
   const request: ChatCompletionsPayload = {
     messages: [
@@ -42,19 +41,16 @@ export async function runAutocommit(options: AutocommitOptions): Promise<void> {
         content: stdout.toString(),
       },
     ],
-    temperature: 0.2,
-
+    temperature: appConfig.temperature || 0.7,
     model: appConfig.model || "gpt-3.5-turbo",
     stream: false,
   }
-  consola.info("Using model:", request.model)
   const result: ChatCompletionResponse = (await createChatCompletions(
     request,
   )) as ChatCompletionResponse
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (result.choices.length === 1) {
     const commitMessage = result.choices[0].message.content.trim()
-    consola.info("Generated commit message:", commitMessage)
+    consola.info("Generated commit message:\n", commitMessage)
     const options = [
       { label: "Apply commit message", value: "apply" },
       { label: "Copy commit message", value: "copy" },
@@ -65,10 +61,8 @@ export async function runAutocommit(options: AutocommitOptions): Promise<void> {
       message: "What do you want to do with the commit message?",
     })
     executeAutocommitOptions(selectedOption, commitMessage)
-
-    return
   }
-  return
+  exit(0)
 }
 
 export function executeAutocommitOptions(

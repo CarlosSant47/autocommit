@@ -34,13 +34,20 @@ async function ensureFile(
   initalContent: string = "",
 ): Promise<void> {
   try {
-    if (await fs.exists(filePath)) {
+    if (await fileExists(filePath)) {
       return
     }
-    await fs.access(filePath, fs.constants.W_OK)
     await fs.writeFile(filePath, initalContent, { flag: "a" })
+  } catch (error) {
+    console.warn(`File ${filePath} does not exist, creating it...`)
+  }
+}
+
+async function fileExists(filePath: string): Promise<boolean> {
+  try {
+    await fs.access(filePath)
+    return true
   } catch {
-    await fs.writeFile(filePath, "")
-    await fs.chmod(filePath, 0o600)
+    return false
   }
 }

@@ -4,6 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsup",
+    "build:bin": "nexe ./dist/main.js -o ./dist/autocommit --build --target linux-x64-gnu,mac-x64-gnu,win-x64-msvc",
     "dev": "bun run --watch ./src/main.ts",
     "knip": "knip-bun",
     "prepack": "bun run build",
@@ -11,7 +12,7 @@
     "start": "NODE_ENV=production bun run ./src/main.ts"
   },
   "bin": {
-    "copilot-api": "./dist/main.js"
+    "autocommit": "./dist/main.js"
   },
   "author": "Carlos Santiago <me@carlossant47.com>",
   "license": "ISC",
@@ -30,6 +31,7 @@
     "fetch-event-stream": "^0.1.5",
     "gpt-tokenizer": "^2.9.0",
     "hono": "^4.7.6",
+    "nanoid": "^5.1.5",
     "srvx": "^0.2.7"
   },
   "devDependencies": {
@@ -38,6 +40,8 @@
     "eslint": "^9.24.0",
     "jiti": "^2.4.2",
     "knip": "^5.49.0",
+    "nexe": "^5.0.0-beta.4",
+    "pkg": "^5.8.1",
     "tsup": "^8.4.0",
     "typescript": "^5.8.3"
   }

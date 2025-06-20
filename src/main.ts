@@ -1,6 +1,7 @@
 import { defineCommand, runMain } from "citty"
 
-import { auth } from "./auth"
+//import { auth } from "./auth"
+import { auth } from "./commands/auth"
 import { commit } from "./autocommit"
 import { config } from "./config"
 import { ensurePaths } from "./lib/paths"

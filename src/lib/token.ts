@@ -68,7 +68,6 @@ export async function setupGitHubToken(
     if (githubToken && !options?.force) {
       state.githubToken = githubToken
       await logUser()
-
       return
     }
 
